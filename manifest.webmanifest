@@ -1,0 +1,28 @@
+{
+  "name": "Imprimir en la Kyocera",
+  "short_name": "Imprimir",
+  "description": "Arma el documento con papel, caras, escala y copias, y lo manda por correo a la Kyocera.",
+  "lang": "es",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f1216",
+  "theme_color": "#1f4fd1",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "share_target": {
+    "action": "./share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "files": [
+        { "name": "files", "accept": ["application/pdf", ".pdf", "image/*", ".jpg", ".jpeg", ".png", ".webp", ".heic"] }
+      ]
+    }
+  }
+}

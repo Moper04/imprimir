@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f4fd1">
+<title>Imprimir en la Kyocera</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<script src="vendor/pdf-lib.min.js" defer></script>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--ink:#15181d;--mut:#5d6572;--rule:#d9dde4;--acc:#1f4fd1;--acc-ink:#fff;--soft:#e3eafc;--ok:#1d7a46;--warn:#a65d00;--bad:#b3261e;
+  --sys:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:ui-monospace,"Roboto Mono",Menlo,monospace}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1216;--card:#181c22;--ink:#e8ebf0;--mut:#9aa3b0;--rule:#2b313a;--acc:#7c9cff;--acc-ink:#0b1020;--soft:#1d2640;--ok:#5cc98a;--warn:#e2a54a;--bad:#ff8a80;color-scheme:dark}}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.45 var(--sys);
+  padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}
+.wrap{max-width:640px;margin:0 auto;display:grid;gap:14px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+h1{margin:0;font-size:22px;font-weight:700;letter-spacing:-.01em}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:14px;display:grid;gap:14px}
+.lbl{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{flex:1 1 0;min-width:72px;font:inherit;font-size:15px;padding:9px 8px;border-radius:9px;border:1px solid var(--rule);background:transparent;color:var(--ink);line-height:1.2}
+.seg small{display:block;font-size:11px;color:var(--mut)}
+.seg [aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:var(--acc-ink)}
+.seg [aria-pressed=true] small{color:inherit;opacity:.85}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+input{font:inherit;font-size:16px;padding:9px 11px;border-radius:9px;border:1px solid var(--rule);background:var(--bg);color:var(--ink);width:100%;min-width:0}
+.row{display:flex;gap:8px;align-items:center}
+.step{display:inline-flex;border:1px solid var(--rule);border-radius:9px;overflow:hidden;flex:none}
+.step button{font:inherit;font-size:20px;width:44px;border:0;background:transparent;color:var(--ink)}
+.step output{min-width:44px;text-align:center;font:17px var(--mono);padding:9px 0;border-inline:1px solid var(--rule)}
+.pick{display:block;text-align:center;padding:16px;border:1.5px dashed var(--rule);border-radius:12px;color:var(--mut)}
+.pick b{color:var(--acc)}
+.pick input{display:none}
+ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+li{display:flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid var(--rule);border-radius:9px;min-width:0}
+li .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+li .p{font:13px var(--mono);color:var(--mut);white-space:nowrap}
+.ic{font:inherit;border:0;background:transparent;color:var(--mut);padding:4px 7px;border-radius:7px;font-size:15px}
+.sum{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--rule);border-radius:9px;overflow:hidden}
+.sum div{padding:9px 11px;border-left:1px solid var(--rule)}.sum div:first-child{border-left:0}
+.sum b{display:block;font:500 21px var(--mono)}
+.sum span{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+.sheets{display:flex;flex-wrap:wrap;gap:8px}
+.sh{display:grid;grid-template-columns:1fr 1fr;gap:3px;width:76px}
+.sh i{aspect-ratio:.773;border:1px solid var(--rule);border-radius:3px;background:#fff;color:#1f2a44;display:grid;place-items:center;font:600 13px var(--mono);font-style:normal}
+.sh i.b{color:#a0a7b3;font-size:10px;font-weight:400}
+.sh i.r{transform:rotate(180deg)}
+.sh span{grid-column:1/-1;font:11px var(--mono);color:var(--mut)}
+.go{font:inherit;font-size:18px;font-weight:600;padding:14px;border-radius:12px;border:0;background:var(--acc);color:var(--acc-ink)}
+.go:disabled{opacity:.45}
+.sec{font:inherit;font-size:15px;padding:10px;border-radius:9px;border:1px solid var(--rule);background:transparent;color:var(--ink)}
+.msg{font-size:14px;padding:10px 12px;border-radius:9px;border:1px solid currentColor}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+.hint{font-size:13px;color:var(--mut);margin:0}
+.t2{margin:0 0 4px;font-size:19px}
+.pf{display:grid;gap:8px;padding-top:12px;border-top:1px solid var(--rule)}
+li.on{border-color:var(--acc)}
+li .e{display:block;font:12px var(--mono);color:var(--mut);overflow:hidden;text-overflow:ellipsis}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Imprimir</h1>
+    <button class="ic" id="cfgBtn" aria-label="Ajustes de la app">⚙ Ajustes</button>
+  </header>
+  <div class="msg" id="msg" role="status" hidden></div>
+
+  <!-- Primera vez: no deja usar la app hasta tener ID de Google y una impresora -->
+  <form class="card" id="setup" hidden>
+    <div><h2 class="t2">Bienvenido</h2><p class="hint">Estos datos se guardan solo en este teléfono. Puedes cambiarlos después en Ajustes.</p></div>
+    <div><div class="lbl">ID de cliente de Google</div><input type="text" id="suClient" required placeholder="123…apps.googleusercontent.com" autocomplete="off" spellcheck="false" autocapitalize="off">
+      <p class="hint">Sale de Google Cloud → Credenciales. Permite enviar desde tu Gmail.</p></div>
+    <div><div class="lbl">Nombre de la impresora</div><input type="text" id="suName" required placeholder="Kyocera oficina" autocomplete="off"></div>
+    <div><div class="lbl">Correo de la impresora</div><input type="email" id="suEmail" required placeholder="buzon-de-la-impresora@gmail.com" autocomplete="off" autocapitalize="off"></div>
+    <div><div class="lbl">Tu Gmail (opcional)</div><input type="email" id="suFrom" placeholder="para no escogerlo cada vez" autocomplete="email" autocapitalize="off"></div>
+    <button class="go" type="submit">Empezar</button>
+  </form>
+
+  <!-- Ajustes -->
+  <div class="card" id="cfg" hidden>
+    <div><div class="lbl">Impresoras</div><ul id="pList"></ul></div>
+    <form id="pForm" class="pf">
+      <div class="lbl" id="pFormT">Agregar impresora</div>
+      <input type="text" id="pName" required placeholder="Nombre (ej. Kyocera bodega)" autocomplete="off">
+      <input type="email" id="pEmail" required placeholder="correo-de-la-impresora@gmail.com" autocomplete="off" autocapitalize="off">
+      <div class="row"><button class="sec" type="submit" id="pSave" style="flex:1">Agregar</button><button class="sec" type="button" id="pCancel" hidden>Cancelar</button></div>
+    </form>
+    <form id="gForm" class="pf">
+      <div class="lbl">ID de cliente de Google</div>
+      <input type="text" id="cClient" required autocomplete="off" spellcheck="false" autocapitalize="off">
+      <div class="lbl">Tu Gmail (opcional)</div>
+      <input type="email" id="cFrom" placeholder="para no escogerlo cada vez" autocomplete="email" autocapitalize="off">
+      <button class="sec" type="submit">Guardar</button>
+    </form>
+    <button class="sec" type="button" id="cfgClose">Listo</button>
+  </div>
+
+  <div class="card" id="dest" hidden>
+    <div><div class="lbl">Enviar a</div><div class="seg" id="pPick"></div></div>
+  </div>
+
+  <section class="card" id="main">
+    <div>
+      <label class="pick"><input type="file" id="file" multiple accept="application/pdf,image/*"><b>Escoger PDF o fotos</b><br><span class="hint">o usa Compartir → Imprimir desde cualquier app</span></label>
+    </div>
+    <ul id="list"></ul>
+
+    <div><div class="lbl">Papel</div><div class="seg" data-k="paper">
+      <button type="button" data-v="carta">Carta<small>8½×11</small></button>
+      <button type="button" data-v="oficio">Oficio<small>8½×13</small></button>
+      <button type="button" data-v="legal">Legal<small>8½×14</small></button>
+      <button type="button" data-v="a4">A4</button></div></div>
+
+    <div><div class="lbl">Caras</div><div class="seg" data-k="sides">
+      <button type="button" data-v="1">Una cara</button>
+      <button type="button" data-v="2L">Doble<small>como libro</small></button>
+      <button type="button" data-v="2S">Doble<small>hacia arriba</small></button></div></div>
+
+    <div><div class="lbl">Orientación</div><div class="seg" data-k="orient">
+      <button type="button" data-v="auto">Auto</button>
+      <button type="button" data-v="v">Vertical</button>
+      <button type="button" data-v="h">Horizontal</button></div></div>
+
+    <div><div class="lbl">Escala</div><div class="seg" data-k="scale">
+      <button type="button" data-v="fit">Ajustar</button>
+      <button type="button" data-v="real">Real</button>
+      <button type="button" data-v="pct">%</button></div>
+      <div class="row" id="pctRow" style="margin-top:8px"><input type="number" id="pct" min="10" max="400" step="5" style="max-width:100px"><span>%</span></div></div>
+
+    <div><div class="lbl">Copias y páginas</div><div class="row">
+      <div class="step"><button type="button" id="cm" aria-label="Menos copias">−</button><output id="cp">1</output><button type="button" id="cpl" aria-label="Más copias">+</button></div>
+      <input type="text" id="range" placeholder="Todas (ej. 1-3, 5)" inputmode="numeric"></div></div>
+  </section>
+
+  <section class="card" id="main2">
+    <div class="sum"><div><b id="sP">0</b><span>páginas</span></div><div><b id="sH">0</b><span>hojas</span></div><div><b id="sC">0</b><span>copias</span></div></div>
+    <div class="sheets" id="prev"></div>
+    <p class="hint" id="desc"></p>
+    <button class="go" id="send" disabled>Enviar a la impresora</button>
+    <button class="sec" id="save" disabled>Guardar el PDF</button>
+  </section>
+</div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const ls = { get(k){ try { return localStorage.getItem(k) } catch { return null } }, set(k,v){ try { localStorage.setItem(k,v) } catch {} } };
+const PAPER = { carta:[612,792], oficio:[612,936], legal:[612,1008], a4:[595.28,841.89] };
+const S = Object.assign({ paper:"carta", sides:"2L", orient:"auto", scale:"fit", pct:90 }, JSON.parse(ls.get("s") || "{}"), { copies:1, range:"" });
+let files = [];   // {name, kind:"pdf"|"img", bytes, pages, img:{buf,w,h}}
+let plan = null;  // [{src:índice|null, back:bool}]
+/* ---------- impresoras y datos guardados ---------- */
+const printers = () => { try { return JSON.parse(ls.get("printers") || "[]"); } catch { return []; } };
+const savePrinters = p => ls.set("printers", JSON.stringify(p));
+const active = () => { const p = printers(); return p.find(x => x.id === ls.get("active")) || p[0] || null; };
+const cfg = () => ({ dest: active()?.email || "", client: ls.get("client") || "", from: ls.get("from") || "" });
+const okMail = s => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+const newId = () => Math.random().toString(36).slice(2, 9);
+let editing = null;
+
+function view(){
+  const ready = !!(ls.get("client") && printers().length);
+  $("setup").hidden = ready;
+  $("main").hidden = $("main2").hidden = !ready;
+  $("cfgBtn").hidden = !ready;
+  $("dest").hidden = !ready || $("cfg").hidden === false;
+  pickers(); refresh();
+}
+function pickers(){
+  const p = printers(), act = active(), box = $("pPick"); box.textContent = "";
+  p.forEach(x => {
+    const b = document.createElement("button"); b.type = "button";
+    b.setAttribute("aria-pressed", x.id === act?.id);
+    b.append(x.name); const s = document.createElement("small"); s.textContent = x.email; b.append(s);
+    b.onclick = () => { ls.set("active", x.id); pickers(); refresh(); };
+    box.append(b);
+  });
+  const ul = $("pList"); ul.textContent = "";
+  p.forEach(x => {
+    const li = document.createElement("li"); if (x.id === act?.id) li.className = "on";
+    const n = document.createElement("span"); n.className = "n"; n.textContent = x.name;
+    const e = document.createElement("span"); e.className = "e"; e.textContent = x.email; n.append(e);
+    li.append(n,
+      mk("✎", "Editar", () => { editing = x.id; $("pName").value = x.name; $("pEmail").value = x.email; $("pFormT").textContent = "Editar impresora"; $("pSave").textContent = "Guardar"; $("pCancel").hidden = false; $("pName").focus(); }),
+      mk("✕", "Quitar", () => {
+        if (p.length === 1) return say("warn", "Debe quedar al menos una impresora.");
+        if (li.dataset.sure !== "1") { li.dataset.sure = "1"; li.lastChild.textContent = "¿Quitar?"; return; }
+        savePrinters(p.filter(y => y.id !== x.id)); if (ls.get("active") === x.id) ls.set("active", ""); pickers(); refresh();
+      }));
+    ul.append(li);
+  });
+}
+function resetPForm(){ editing = null; $("pForm").reset(); $("pFormT").textContent = "Agregar impresora"; $("pSave").textContent = "Agregar"; $("pCancel").hidden = true; }
+
+$("setup").onsubmit = e => {
+  e.preventDefault();
+  const client = $("suClient").value.trim(), name = $("suName").value.trim(), email = $("suEmail").value.trim();
+  if (!/\.apps\.googleusercontent\.com$/.test(client)) return say("bad", "El ID de cliente termina en .apps.googleusercontent.com. Revisa que lo copiaste completo.");
+  if (!okMail(email)) return say("bad", "El correo de la impresora no parece válido.");
+  const id = newId();
+  ls.set("client", client); ls.set("from", $("suFrom").value.trim());
+  savePrinters([{ id, name, email }]); ls.set("active", id);
+  say(); view(); preloadGoogle();
+};
+$("cfgBtn").onclick = () => {
+  const open = $("cfg").hidden;
+  $("cfg").hidden = !open; $("dest").hidden = open;
+  if (open) { $("cClient").value = ls.get("client") || ""; $("cFrom").value = ls.get("from") || ""; resetPForm(); pickers(); }
+};
+$("cfgClose").onclick = () => { $("cfg").hidden = true; $("dest").hidden = false; say(); };
+$("pCancel").onclick = resetPForm;
+$("pForm").onsubmit = e => {
+  e.preventDefault();
+  const name = $("pName").value.trim(), email = $("pEmail").value.trim();
+  if (!okMail(email)) return say("bad", "Ese correo no parece válido.");
+  const p = printers();
+  if (editing) Object.assign(p.find(x => x.id === editing) || {}, { name, email });
+  else { const id = newId(); p.push({ id, name, email }); ls.set("active", id); }
+  savePrinters(p); resetPForm(); pickers(); refresh(); say("ok", `Impresora «${name}» guardada.`);
+};
+$("gForm").onsubmit = e => {
+  e.preventDefault();
+  const client = $("cClient").value.trim();
+  if (!/\.apps\.googleusercontent\.com$/.test(client)) return say("bad", "El ID de cliente termina en .apps.googleusercontent.com.");
+  const changed = client !== ls.get("client");
+  ls.set("client", client); ls.set("from", $("cFrom").value.trim());
+  if (changed) { ls.set("tok", ""); ls.set("authOk", ""); token = null; tc = null; preloadGoogle(); }
+  say("ok", "Datos de Google guardados.");
+};
+// Versión anterior: un solo correo en "dest".
+if (!printers().length && ls.get("dest")) { const id = newId(); savePrinters([{ id, name: "Kyocera", email: ls.get("dest") }]); ls.set("active", id); }
+
+/* ---------- opciones ---------- */
+document.querySelectorAll(".seg").forEach(g => g.onclick = e => {
+  const b = e.target.closest("button"); if (!b) return;
+  S[g.dataset.k] = b.dataset.v; paint(); refresh();
+});
+$("pct").oninput = () => { const n = +$("pct").value; if (n >= 10 && n <= 400) { S.pct = n; refresh(); } };
+$("cm").onclick = () => { if (S.copies > 1) { S.copies--; paint(); refresh(); } };
+$("cpl").onclick = () => { if (S.copies < 99) { S.copies++; paint(); refresh(); } };
+$("range").oninput = () => { S.range = $("range").value; refresh(); };
+function paint(){
+  document.querySelectorAll(".seg").forEach(g => g.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", S[g.dataset.k] === b.dataset.v)));
+  $("pctRow").hidden = S.scale !== "pct"; $("pct").value = S.pct; $("cp").textContent = S.copies;
+  ls.set("s", JSON.stringify({ paper:S.paper, sides:S.sides, orient:S.orient, scale:S.scale, pct:S.pct }));
+}
+
+/* ---------- archivos ---------- */
+$("file").onchange = e => { addFiles([...e.target.files]); e.target.value = ""; };
+const pdfLib = () => new Promise(r => { if (window.PDFLib) r(PDFLib); else addEventListener("load", () => r(PDFLib), { once:true }); });
+
+async function addFiles(list){
+  const { PDFDocument } = await pdfLib();
+  for (const f of list) {
+    const isPdf = f.type === "application/pdf" || /\.pdf$/i.test(f.name);
+    try {
+      if (isPdf) {
+        const bytes = await f.arrayBuffer();
+        const d = await PDFDocument.load(bytes, { ignoreEncryption:true, updateMetadata:false });
+        files.push({ name:f.name, kind:"pdf", bytes, pages:d.getPageCount() });
+      } else {
+        files.push({ name:f.name, kind:"img", pages:1, img: await toJpeg(f) });
+      }
+    } catch { say("bad", `No pude abrir «${f.name}». ${isPdf ? "Puede estar dañado o con clave." : "Ese formato de imagen no se puede leer aquí; prueba con JPG o PNG."}`); }
+  }
+  list_(); refresh();
+}
+function toJpeg(file){
+  return new Promise((ok, no) => {
+    const u = URL.createObjectURL(file), im = new Image();
+    im.onload = () => {
+      const k = Math.min(1, 3300 / Math.max(im.naturalWidth, im.naturalHeight)), c = document.createElement("canvas");
+      c.width = Math.round(im.naturalWidth * k); c.height = Math.round(im.naturalHeight * k);
+      const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.drawImage(im, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(u);
+      c.toBlob(b => b ? b.arrayBuffer().then(buf => ok({ buf, w:c.width, h:c.height })) : no(), "image/jpeg", .88);
+    };
+    im.onerror = () => { URL.revokeObjectURL(u); no(); };
+    im.src = u;
+  });
+}
+function list_(){
+  const ul = $("list"); ul.textContent = "";
+  files.forEach((f, i) => {
+    const li = document.createElement("li");
+    li.innerHTML = `<span class="n"></span><span class="p">${f.pages} pág.</span>`;
+    li.firstChild.textContent = f.name;
+    const up = mk("↑", "Subir", () => { [files[i-1], files[i]] = [files[i], files[i-1]]; list_(); refresh(); }); up.disabled = i === 0;
+    li.append(up, mk("✕", "Quitar", () => { files.splice(i, 1); list_(); refresh(); }));
+    ul.append(li);
+  });
+}
+function mk(t, l, fn){ const b = document.createElement("button"); b.type = "button"; b.className = "ic"; b.textContent = t; b.ariaLabel = l; b.onclick = fn; return b; }
+
+/* Archivos que llegan desde Compartir (los deja el service worker). */
+async function takeShared(){
+  if (!location.search.includes("compartido") || !("caches" in window)) return;
+  const c = await caches.open("compartidos"), got = [];
+  for (const k of await c.keys()) {
+    const r = await c.match(k), b = await r.blob();
+    got.push(new File([b], decodeURIComponent(r.headers.get("x-name") || "archivo"), { type: b.type || r.headers.get("content-type") || "" }));
+    await c.delete(k);
+  }
+  history.replaceState(null, "", location.pathname);
+  if (got.length) { files = []; addFiles(got); }
+}
+
+/* ---------- plan de hojas (rápido, sin tocar el PDF) ---------- */
+function pages(str, total){
+  str = (str || "").trim(); if (!str) return [...Array(total).keys()];
+  const out = [];
+  for (const part of str.split(/[,;\s]+/).filter(Boolean)) {
+    const m = part.match(/^(\d*)(-?)(\d*)$/); if (!m || (!m[1] && !m[3])) throw new Error(`No entiendo «${part}» en las páginas.`);
+    const a = m[1] ? +m[1] : 1, b = m[2] ? (m[3] ? +m[3] : total) : a;
+    if (a < 1 || b > total || a > b) throw new Error(`Las páginas van de 1 a ${total}.`);
+    for (let p = a; p <= b; p++) out.push(p - 1);
+  }
+  return out;
+}
+function makePlan(){
+  const total = files.reduce((n, f) => n + f.pages, 0);
+  const pick = pages(S.range, total), dup = S.sides !== "1", out = [];
+  for (let c = 0; c < S.copies; c++) {
+    pick.forEach((p, k) => { out.push({ src:p }); if (!dup && !(c === S.copies - 1 && k === pick.length - 1)) out.push({ src:null }); });
+    if (dup && c < S.copies - 1 && out.length % 2) out.push({ src:null });
+  }
+  out.forEach((s, i) => s.back = i % 2 === 1);
+  return { slots: out, n: pick.length };
+}
+function describe(){
+  return [{ carta:"carta", oficio:"oficio", legal:"legal", a4:"A4" }[S.paper],
+    { "1":"una cara", "2L":"doble cara (libro)", "2S":"doble cara (hacia arriba)" }[S.sides],
+    S.scale === "fit" ? "ajustado a la hoja" : S.scale === "real" ? "tamaño real" : S.pct + " %",
+    S.copies + (S.copies === 1 ? " copia" : " copias")].join(", ") + (S.range.trim() ? `, págs. ${S.range.trim()}` : "");
+}
+function refresh(){
+  plan = null; $("prev").textContent = "";
+  try {
+    if (files.length) plan = makePlan();
+    if (!$("msg").classList.contains("ok")) say();
+  } catch (e) { say("bad", e.message); }
+  const p = plan;
+  $("sP").textContent = p ? p.n * S.copies : 0;
+  $("sH").textContent = p ? Math.ceil(p.slots.length / 2) : 0;
+  $("sC").textContent = S.copies;
+  $("desc").textContent = p ? "Saldrá en " + describe() + "." : "";
+  if (p) {
+    const max = 12, sheets = Math.ceil(p.slots.length / 2);
+    for (let s = 0; s < Math.min(sheets, max); s++) {
+      const d = document.createElement("div"); d.className = "sh";
+      for (const slot of [p.slots[2*s], p.slots[2*s+1]]) {
+        const i = document.createElement("i");
+        if (!slot || slot.src === null) { i.className = "b"; i.textContent = slot ? "blanco" : ""; }
+        else { i.textContent = slot.src + 1; if (slot.back && S.sides === "2S") i.className = "r"; }
+        d.append(i);
+      }
+      d.insertAdjacentHTML("beforeend", `<span>hoja ${s + 1}</span>`);
+      $("prev").append(d);
+    }
+    if (sheets > max) $("prev").insertAdjacentHTML("beforeend", `<p class="hint">y ${sheets - max} hojas más</p>`);
+  }
+  const c = cfg();
+  $("send").disabled = !(p && c.dest && c.client);
+  $("save").disabled = !p;
+}
+
+/* ---------- armar el PDF (solo al enviar o guardar) ---------- */
+async function build(){
+  const { PDFDocument, degrees } = await pdfLib();
+  const [W, H] = PAPER[S.paper], out = await PDFDocument.create(), items = [];
+  for (const f of files) {
+    if (f.kind === "pdf") (await PDFDocument.load(f.bytes, { ignoreEncryption:true })).getPages().forEach(pg => items.push({ pg }));
+    else items.push({ im: f.img });
+  }
+  const cache = new Map();
+  for (const slot of plan.slots) {
+    const page = out.addPage([W, H]);
+    if (slot.back && S.sides === "2S") page.setRotation(degrees(180));
+    if (slot.src === null) continue;
+    const it = items[slot.src];
+    let e = cache.get(it);
+    if (!e) {
+      if (it.pg) { const b = it.pg.getCropBox(); e = { pg: await out.embedPage(it.pg, { left:b.x, bottom:b.y, right:b.x + b.width, top:b.y + b.height }), w:b.width, h:b.height, rot: ((it.pg.getRotation().angle % 360) + 360) % 360 }; }
+      else e = { im: await out.embedJpg(it.im.buf), w: it.im.w * .24, h: it.im.h * .24, rot:0 };
+      cache.set(it, e);
+    }
+    let t = e.rot;
+    const wide = t % 180 ? e.h > e.w : e.w > e.h;
+    if (S.orient === "h" || (S.orient === "auto" && wide)) t = (t + 270) % 360;
+    const dw = t % 180 ? e.h : e.w, dh = t % 180 ? e.w : e.h;
+    const s = S.scale === "fit" ? Math.min(W / dw, H / dh) * .97 : S.scale === "real" ? 1 : S.pct / 100;
+    const sw = e.w * s, sh = e.h * s, x0 = (W - dw * s) / 2, y0 = (H - dh * s) / 2;
+    const [x, y] = { 0:[x0, y0], 90:[x0, y0 + sw], 180:[x0 + sw, y0 + sh], 270:[x0 + sh, y0] }[t];
+    if (e.pg) page.drawPage(e.pg, { x, y, xScale:s, yScale:s, rotate:degrees(-t) });
+    else page.drawImage(e.im, { x, y, width:sw, height:sh, rotate:degrees(-t) });
+  }
+  return out.save();
+}
+function outName(){
+  const base = (files[0]?.name || "documento").replace(/\.[^.]+$/, "");
+  return base + (files.length > 1 ? ` y ${files.length - 1} más` : "");
+}
+
+/* ---------- Google: permiso para enviar desde Gmail ---------- */
+let tc = null, token = null, tokenExp = 0, pending = null;
+try { const t = JSON.parse(ls.get("tok") || "null"); if (t && t.exp > Date.now() + 60000) { token = t.v; tokenExp = t.exp; } } catch {}
+function preloadGoogle(){
+  const c = cfg(); if (!c.client || tc) return;
+  const s = document.createElement("script"); s.src = "https://accounts.google.com/gsi/client"; s.async = true;
+  s.onload = () => {
+    tc = google.accounts.oauth2.initTokenClient({
+      client_id: c.client, scope: "https://www.googleapis.com/auth/gmail.send", login_hint: c.from || undefined,
+      callback: r => {
+        if (r.error) { pending = null; return fail(new Error(r.error === "access_denied" ? "No diste permiso para enviar desde Gmail." : "Google no dio el permiso (" + r.error + ").")); }
+        token = r.access_token; tokenExp = Date.now() + r.expires_in * 1000; ls.set("tok", JSON.stringify({ v:token, exp:tokenExp })); ls.set("authOk", "1");
+        const go = pending; pending = null; go && go();
+      },
+      error_callback: e => { pending = null; fail(new Error(e.type === "popup_closed" ? "Cerraste la ventana de Google sin autorizar." : e.type === "popup_failed_to_open" ? "El teléfono bloqueó la ventana de Google. Vuelve a tocar Enviar." : "Error de Google: " + e.type)); }
+    });
+  };
+  document.head.append(s);
+}
+
+/* ---------- enviar ---------- */
+$("send").onclick = () => {
+  if (!plan) return;
+  busy(true);
+  if (token && Date.now() < tokenExp - 60000) return sendNow();
+  if (!tc) { busy(false); return say("warn", "Todavía está cargando el acceso a Google. Espera un segundo y vuelve a tocar Enviar."); }
+  pending = sendNow;
+  tc.requestAccessToken({ prompt: ls.get("authOk") ? "" : "consent" }); // debe ir dentro del toque, sin esperas antes
+};
+async function sendNow(){
+  try {
+    say("warn", "Armando el documento…");
+    const bytes = await build();
+    if (bytes.length > 30 * 1048576) throw new Error("El documento pasa de 30 MB. Envía menos páginas.");
+    say("warn", "Enviando…");
+    const c = cfg(), name = outName(), file = ascii(name) + ".pdf", bd = "b" + Math.random().toString(36).slice(2);
+    const mime = [
+      `To: ${c.dest}`, `Subject: =?UTF-8?B?${b64s("Imprimir: " + name)}?=`, "MIME-Version: 1.0",
+      `Content-Type: multipart/mixed; boundary="${bd}"`, "",
+      `--${bd}`, "Content-Type: text/plain; charset=UTF-8", "Content-Transfer-Encoding: base64", "",
+      wrap76(b64s(`Ajustes: ${describe()}.\nHojas: ${Math.ceil(plan.slots.length / 2)}.`)),
+      `--${bd}`, `Content-Type: application/pdf; name="${file}"`, `Content-Disposition: attachment; filename="${file}"`, "Content-Transfer-Encoding: base64", "",
+      wrap76(b64b(bytes)), `--${bd}--`, ""
+    ].join("\r\n");
+    const r = await fetch("https://gmail.googleapis.com/upload/gmail/v1/users/me/messages/send?uploadType=media", {
+      method: "POST", headers: { Authorization: "Bearer " + token, "Content-Type": "message/rfc822" }, body: mime
+    });
+    if (r.status === 401) { token = null; ls.set("tok", ""); throw new Error("El permiso de Google venció. Toca Enviar otra vez."); }
+    if (!r.ok) { const t = await r.text(); throw new Error(r.status === 403 ? "Google rechazó el envío (403). Revisa que la API de Gmail esté activada en tu proyecto." : `Gmail respondió ${r.status}: ${t.slice(0, 160)}`); }
+    say("ok", `Enviado a ${active().name} (${c.dest}). La impresora lo recoge en su próxima revisión del buzón.`);
+  } catch (e) { fail(e); }
+  busy(false);
+}
+function fail(e){ busy(false); say("bad", e.message || String(e)); }
+function busy(on){ $("send").disabled = on || !plan; $("send").textContent = on ? "Enviando…" : "Enviar a la impresora"; }
+
+$("save").onclick = async () => {
+  try {
+    const bytes = await build(), a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([bytes], { type:"application/pdf" })); a.download = outName() + ".pdf"; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 30000);
+  } catch (e) { fail(e); }
+};
+
+/* ---------- utilidades ---------- */
+function b64s(s){ return btoa(unescape(encodeURIComponent(s))); }
+function b64b(u8){ let s = ""; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); }
+function wrap76(s){ return s.replace(/.{76}/g, "$&\r\n"); }
+function ascii(s){ return s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^\w.-]+/g, "_").replace(/^_+|_+$/g, "") || "documento"; }
+function say(kind, text){ const m = $("msg"); m.hidden = !kind; m.className = "msg " + (kind || ""); m.textContent = text || ""; }
+
+/* ---------- arranque ---------- */
+paint(); view(); takeShared();
+setTimeout(preloadGoogle, 300);
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+</script>
+</body>
+</html>
