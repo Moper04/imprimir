@@ -2,7 +2,7 @@
 // 1) Recibe los archivos que llegan desde el menú Compartir de Android (share_target, POST a ./share)
 //    y los deja en la caché "compartidos" para que la página los recoja.
 // 2) Guarda la app para que abra aunque la señal sea mala.
-const VERSION = "v2";
+const VERSION = "v3";
 const APP = "app-" + VERSION;
 const SHARED = "compartidos";
 const CORE = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./vendor/pdf-lib.min.js"];

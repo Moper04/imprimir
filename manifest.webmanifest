@@ -3,26 +3,70 @@
   "short_name": "Imprimir",
   "description": "Arma el documento con papel, caras, escala y copias, y lo manda por correo a la Kyocera.",
   "lang": "es",
-  "id": "./",
-  "start_url": "./",
-  "scope": "./",
+  "id": "https://moper04.github.io/imprimir/",
+  "start_url": "https://moper04.github.io/imprimir/",
+  "scope": "https://moper04.github.io/imprimir/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0f1216",
   "theme_color": "#1f4fd1",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ],
   "share_target": {
-    "action": "./share",
+    "action": "https://moper04.github.io/imprimir/share",
     "method": "POST",
     "enctype": "multipart/form-data",
     "params": {
       "title": "title",
       "files": [
-        { "name": "files", "accept": ["application/pdf", ".pdf", "image/*", ".jpg", ".jpeg", ".png", ".webp", ".heic"] }
+        {
+          "name": "files",
+          "accept": [
+            "application/pdf",
+            "image/*"
+          ]
+        }
       ]
     }
-  }
+  },
+  "file_handlers": [
+    {
+      "action": "https://moper04.github.io/imprimir/",
+      "accept": {
+        "application/pdf": [
+          ".pdf"
+        ],
+        "image/jpeg": [
+          ".jpg",
+          ".jpeg"
+        ],
+        "image/png": [
+          ".png"
+        ],
+        "image/webp": [
+          ".webp"
+        ]
+      },
+      "icons": [
+        {
+          "src": "https://moper04.github.io/imprimir/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ],
+      "launch_type": "single-client"
+    }
+  ]
 }

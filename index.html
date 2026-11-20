@@ -311,6 +311,13 @@ async function takeShared(){
   history.replaceState(null, "", location.pathname);
   if (got.length) { files = []; addFiles(got); }
 }
+/* «Abrir con → Imprimir» (file_handlers): Android entrega los archivos por launchQueue. */
+if ("launchQueue" in window) launchQueue.setConsumer(async p => {
+  if (!p.files || !p.files.length) return;
+  const got = [];
+  for (const h of p.files) { try { got.push(await h.getFile()); } catch {} }
+  if (got.length) { files = []; addFiles(got); }
+});
 
 /* ---------- plan de hojas (rápido, sin tocar el PDF) ---------- */
 function pages(str, total){
